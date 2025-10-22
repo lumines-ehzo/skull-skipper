@@ -54,78 +54,6 @@ function App() {
     reader.readAsArrayBuffer(info.file)
   }
 
-  const downloadSample = () => {
-    const wb = XLSX.utils.book_new()
-    
-    const months = [
-      { name: 'มกราคม 2024', data: [
-        { 'รายการ': 'ขายข้าวโพด', 'จำนวน': 5000, 'ประเภท': 'เงินสด', 'วันที่': '2024-01-15' },
-        { 'รายการ': 'ขายปุ๋ยอินทรีย์', 'จำนวน': 15000, 'ประเภท': 'เช็ค', 'วันที่': '2024-01-16' },
-        { 'รายการ': 'ขายผักสด', 'จำนวน': 8000, 'ประเภท': 'เงินสด', 'วันที่': '2024-01-17' }
-      ]},
-      { name: 'กุมภาพันธ์ 2024', data: [
-        { 'รายการ': 'ขายผลไม้สด', 'จำนวน': 25000, 'ประเภท': 'เช็ค', 'วันที่': '2024-02-05' },
-        { 'รายการ': 'ขายไข่ไก่', 'จำนวน': 3500, 'ประเภท': 'เงินสด', 'วันที่': '2024-02-10' },
-        { 'รายการ': 'ขายหมูสด', 'จำนวน': 12000, 'ประเภท': 'เช็ค', 'วันที่': '2024-02-15' }
-      ]},
-      { name: 'มีนาคม 2024', data: [
-        { 'รายการ': 'ขายข้าวหอมมะลิ', 'จำนวน': 45000, 'ประเภท': 'เช็ค', 'วันที่': '2024-03-08' },
-        { 'รายการ': 'ขายผลไม้ตามฤดู', 'จำนวน': 7500, 'ประเภท': 'เงินสด', 'วันที่': '2024-03-12' }
-      ]}
-    ]
-    
-    months.forEach(month => {
-      const ws = XLSX.utils.json_to_sheet(month.data)
-      XLSX.utils.book_append_sheet(wb, ws, month.name)
-    })
-    
-    const buffer = XLSX.write(wb, { bookType: 'xlsx', type: 'array' })
-    saveAs(new Blob([buffer]), 'ตัวอย่างบันทึกการเกษตร.xlsx')
-    
-    message.success('ดาวน์โหลดไฟล์ตัวอย่างเรียบร้อย!')
-  }
-
-  const processFile = async () => {
-    if (!file) return
-    
-    setProcessing(true)
-    
-    const reader = new FileReader()
-    reader.onload = (e) => {
-      const data = new Uint8Array(e.target.result)
-      const workbook = XLSX.read(data, { type: 'array' })
-      
-      let allCashData = []
-      let allCheckData = []
-      
-      workbook.SheetNames.forEach(sheetName => {
-        const worksheet = workbook.Sheets[sheetName]
-        const jsonData = XLSX.utils.sheet_to_json(worksheet)
-        
-        const cashData = jsonData.filter(row => 
-          row['ประเภท'] === 'เงินสด' || 
-          (row['ประเภท'] && row['ประเภท'].toString().toLowerCase().includes('cash')) ||
-          (row['type'] && row['type'].toString().toLowerCase().includes('cash'))
-        ).map(row => ({ ...row, 'ชีท': sheetName }))
-        
-        const checkData = jsonData.filter(row => 
-          row['ประเภท'] === 'เช็ค' || 
-          (row['ประเภท'] && row['ประเภท'].toString().toLowerCase().includes('check')) ||
-          (row['type'] && row['type'].toString().toLowerCase().includes('check'))
-        ).map(row => ({ ...row, 'ชีท': sheetName }))
-        
-        allCashData = [...allCashData, ...cashData]
-        allCheckData = [...allCheckData, ...checkData]
-      })
-      
-      setProcessedData({ cashData: allCashData, checkData: allCheckData })
-      message.success(`จัดการเสร็จสิ้น! เงินสด: ${allCashData.length} รายการ, เช็ค: ${allCheckData.length} รายการ`)
-      setProcessing(false)
-    }
-    
-    reader.readAsArrayBuffer(file)
-  }
-
   const downloadCashFile = () => {
     if (!processedData?.cashData) return
     
@@ -175,24 +103,6 @@ function App() {
                 จัดการไฟล์ Excel
               </Title>
             </div>
-            
-            {/* <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
-              <Button 
-                onClick={downloadSample}
-                style={{
-                  borderRadius: '6px',
-                  height: '50px',
-                  fontSize: '18px',
-                  fontFamily: '"Noto Sans Thai", sans-serif',
-                  padding: '0 2rem',
-                  background: '#4caf50',
-                  color: 'white',
-                  border: 'none'
-                }}
-              >
-                ดาวน์โหลดตัวอย่าง
-              </Button>
-            </div> */}
             
             <div style={{ textAlign: 'center', padding: '2rem 0' }}>
               <Upload
@@ -302,6 +212,25 @@ function App() {
           </Space>
         </Card>
       </div>
+      
+      {/* Itachi Static Animation */}
+      <div style={{
+        position: 'fixed',
+        bottom: '20px',
+        left: '20px',
+        zIndex: 1000
+      }}>
+        <img 
+          src="https://i.gifer.com/5Mys.gif" 
+          alt="Itachi"
+          style={{
+            width: '200px',
+            height: '200px',
+            objectFit: 'contain'
+          }}
+        />
+      </div>
+
     </div>
   )
 }
