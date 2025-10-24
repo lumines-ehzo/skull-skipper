@@ -224,8 +224,8 @@ function App() {
           src="https://i.gifer.com/5Mys.gif" 
           alt="Itachi"
           style={{
-            width: '200px',
-            height: '200px',
+            width: '120px',
+            height: '120px',
             objectFit: 'contain'
           }}
         />
